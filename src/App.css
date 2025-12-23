@@ -182,18 +182,7 @@
   100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
 }
 
-/* Responsive */
-@media (max-width: 640px) {
-  .loading-text h2 {
-    font-size: 1.5rem;
-  }
-  
-  .whatsapp-icon {
-    width: 80px;
-    height: 80px;
-  }
-  
-  .phone {/* PWA Install Button Styles */
+/* PWA Install Button Styles */
 .install-btn {
   position: fixed;
   bottom: 20px;
@@ -233,7 +222,22 @@
   }
 }
 
+/* Responsive Design */
 @media (max-width: 640px) {
+  .loading-text h2 {
+    font-size: 1.5rem;
+  }
+  
+  .whatsapp-icon {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .phone {
+    width: 50px;
+    height: 50px;
+  }
+  
   .install-btn {
     bottom: 10px;
     right: 10px;
@@ -242,11 +246,5 @@
   
   .install-btn > div {
     max-width: 100%;
-  }
-}
-
-/* ... باقی تمام existing CSS styles جو پہلے سے ہیں ... */
-    width: 50px;
-    height: 50px;
   }
 }
