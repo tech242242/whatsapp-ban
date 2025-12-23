@@ -1,21 +1,33 @@
 {
-  "name": "WhatsApp Support | Account Recovery Tool",
-  "short_name": "WhatsApp Support",
-  "description": "Quick and secure WhatsApp account recovery tool",
+  "name": "WhatsApp Support Tool",
+  "short_name": "WA Support",
+  "description": "WhatsApp account recovery and support tool",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "background_color": "#075E54",
   "theme_color": "#25D366",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "/logo.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/logo.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["utilities", "productivity"],
+  "screenshots": [
+    {
+      "src": "https://via.placeholder.com/540x720/075E54/FFFFFF?text=WhatsApp+Support",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow"
     }
   ]
 }
