@@ -8,6 +8,9 @@
 body {
   background-color: #f0f2f5;
   font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
 }
 
 /* Reused styles from original HTML */
@@ -63,4 +66,28 @@ body {
 }
 .email-option.ban {
   border-left: 4px solid #DC2626;
+}
+
+/* Additional utility classes */
+.whatsapp-btn {
+  background-color: var(--whatsapp-green);
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.whatsapp-btn:hover {
+  background-color: #128C7E;
+}
+
+/* Remove scrollbar for cleaner look */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Input focus styles */
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  ring: 2px;
+  ring-color: var(--whatsapp-green);
 }
