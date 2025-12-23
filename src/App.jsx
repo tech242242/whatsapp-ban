@@ -56,35 +56,6 @@ const WelcomeSaqib = () => {
   );
 };
 
-const SupportTools = () => {
-  const [activeTool, setActiveTool] = useState(null);
-
-  const tools = [
-    {
-      id: 1,
-      title: "Account Recovery",
-      icon: "🔄",
-      description: "Recover lost WhatsApp account"
-    },
-    {
-      id: 2,
-      title: "Verification Help",
-      icon: "✅",
-      description: "Get help with verification code"
-    },
-    {
-      id: 3,
-      title: "Chat Backup",
-      icon: "💾",
-      description: "Backup and restore conversations"
-    },
-    {
-      id: 4,
-      title: "Security Check",
-      icon: "🛡️",
-      description: "Enhance account security"
-    }
-  ];
 
   return (
     <div className="support-tools-container">
