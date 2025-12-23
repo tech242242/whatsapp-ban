@@ -4,26 +4,67 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
-    <!-- Basic Meta Tags -->
+    <!-- PWA Meta Tags -->
+    <meta name="application-name" content="WhatsApp Support">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#25D366">
+    
+    <!-- Title -->
     <title>WhatsApp Support | Account Recovery Tool</title>
-    <meta name="description" content="WhatsApp account recovery support">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="/logo.png">
     
     <!-- Favicon -->
-    <link rel="icon" href="/logo.png">
+    <link rel="icon" type="image/png" href="/logo.png">
     
-    <!-- Tailwind CDN -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-
+    
     <!-- Inter Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- PWA Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+              console.log('ServiceWorker registration successful');
+            })
+            .catch(err => {
+              console.log('ServiceWorker registration failed: ', err);
+            });
+        });
+      }
+    </script>
+    
+    <style>
+      .install-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
+        animation: slideInUp 0.5s ease-out;
+      }
+      
+      @keyframes slideInUp {
+        from {
+          transform: translateY(100px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+    </style>
   </head>
   <body>
-    <!-- Simple Logo with Title -->
-    <div class="flex items-center p-4">
-      <img src="/logo.png" alt="Logo" class="w-10 h-10 mr-3">
-      <h1 class="text-xl font-bold text-gray-800">WhatsApp Support</h1>
-    </div>
-    
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
