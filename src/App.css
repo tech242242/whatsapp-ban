@@ -1,0 +1,319 @@
+/* Landing Animation */
+.landing-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: fadeOut 2.5s ease-in-out forwards;
+}
+
+.whatsapp-loader {
+  text-align: center;
+  color: white;
+}
+
+.whatsapp-icon {
+  width: 100px;
+  height: 100px;
+  background: white;
+  border-radius: 20px;
+  margin: 0 auto 30px;
+  position: relative;
+  animation: bounce 1.5s infinite alternate;
+}
+
+.phone {
+  width: 60px;
+  height: 60px;
+  background: #25D366;
+  border-radius: 15px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.speaker {
+  width: 20px;
+  height: 4px;
+  background: #25D366;
+  border-radius: 2px;
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.camera {
+  width: 10px;
+  height: 10px;
+  background: #25D366;
+  border-radius: 50%;
+  position: absolute;
+  top: 15px;
+  right: 15px;
+}
+
+.loading-text h2 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.loading-text p {
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+  opacity: 0.9;
+}
+
+.loading-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.loading-dots span {
+  width: 12px;
+  height: 12px;
+  background: white;
+  border-radius: 50%;
+  animation: pulse 1.4s infinite ease-in-out;
+}
+
+.loading-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loading-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* Welcome Section */
+.welcome-container {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.profile-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.profile-avatar {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #25D366, #128C7E);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #f0f9ff;
+}
+
+.avatar-text {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.welcome-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 4px;
+}
+
+.welcome-title .highlight {
+  color: #25D366;
+}
+
+.welcome-subtitle {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+/* Support Tools */
+.support-tools-container {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #e5e7eb;
+}
+
+.tools-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 8px;
+}
+
+.tools-subtitle {
+  color: #6b7280;
+  margin-bottom: 16px;
+}
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.tool-card {
+  background: #f9fafb;
+  border-radius: 10px;
+  padding: 16px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tool-card:hover {
+  transform: translateY(-2px);
+  border-color: #25D366;
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.1);
+}
+
+.tool-card.active {
+  background: #f0fdf4;
+  border-color: #25D366;
+}
+
+.tool-icon {
+  font-size: 2rem;
+  margin-bottom: 8px;
+}
+
+.tool-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 4px;
+}
+
+.tool-description {
+  color: #6b7280;
+  font-size: 0.8rem;
+}
+
+/* Animations */
+@keyframes bounce {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-15px); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; visibility: hidden; }
+}
+
+/* Original styles from existing app */
+.glass-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(229, 231, 235, 0.6);
+}
+
+.whatsapp-dark-green {
+  background: linear-gradient(135deg, #075E54, #128C7E);
+}
+
+.whatsapp-green {
+  background: linear-gradient(to right, #25D366, #128C7E);
+}
+
+.step-active {
+  background: linear-gradient(to right, #25D366, #128C7E);
+  color: white;
+  box-shadow: 0 2px 8px rgba(37, 211, 102, 0.3);
+}
+
+.step-completed {
+  background: #25D366;
+  color: white;
+}
+
+.step-inactive {
+  background: #d1d5db;
+  color: #6b7280;
+}
+
+.email-option {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.email-option:hover {
+  transform: translateY(-2px);
+}
+
+.email-option.selected {
+  border-color: #25D366;
+  background-color: #f0fdf4;
+  box-shadow: 0 0 0 1px #25D366;
+}
+
+.hidden-section {
+  display: none;
+}
+
+.form-section {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.pulse {
+  animation: pulse-animation 2s infinite;
+}
+
+@keyframes pulse-animation {
+  0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(37, 211, 102, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .tools-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .welcome-title {
+    font-size: 1.2rem;
+  }
+  
+  .whatsapp-icon {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .phone {
+    width: 50px;
+    height: 50px;
+  }
+}
