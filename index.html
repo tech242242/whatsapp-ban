@@ -4,108 +4,27 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
-    <!-- Essential Meta Tags -->
+    <!-- Basic Meta Tags -->
     <title>WhatsApp Support | Account Recovery Tool</title>
-    <meta name="description" content="Quick and secure WhatsApp account recovery tool. Get help with lost accounts, verification issues, and account restoration.">
-    <meta name="keywords" content="WhatsApp, account recovery, support, verification, restore account">
-    <meta name="author" content="WhatsApp Support Team">
+    <meta name="description" content="WhatsApp account recovery support">
     
-    <!-- Open Graph / Facebook Meta Tags -->
-    <meta property="og:title" content="WhatsApp Support | Account Recovery Tool">
-    <meta property="og:description" content="Quick and secure WhatsApp account recovery tool. Get help with lost accounts, verification issues, and account restoration.">
-    <meta property="og:image" content="/logo.png">
-    <meta property="og:url" content="https://yourwebsite.com">
-    <meta property="og:type" content="website">
+    <!-- Favicon -->
+    <link rel="icon" href="/logo.png">
     
-    <!-- Twitter Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="WhatsApp Support | Account Recovery Tool">
-    <meta name="twitter:description" content="Quick and secure WhatsApp account recovery tool. Get help with lost accounts, verification issues, and account restoration.">
-    <meta name="twitter:image" content="/logo.png">
-    
-    <!-- Favicon and App Icons -->
-    <link rel="icon" type="image/png" href="/logo.png">
-    <link rel="apple-touch-icon" href="/logo.png">
-    
-    <!-- Web App Manifest -->
-    <link rel="manifest" href="/manifest.json">
-    
-    <!-- Theme Color -->
-    <meta name="theme-color" content="#25D366">
-    
-    <!-- Tailwind CDN (quick start, no separate build-step needed) -->
+    <!-- Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Allow the app to use the Inter font -->
+    <!-- Inter Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Additional CSS for logo styling -->
-    <style>
-      .logo-title-container {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 16px;
-        background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        border-radius: 12px;
-        margin: 20px;
-        max-width: 400px;
-      }
-      
-      .logo-img {
-        width: 60px;
-        height: 60px;
-        object-fit: contain;
-        border-radius: 10px;
-        border: 3px solid white;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-      }
-      
-      .logo-title {
-        color: white;
-        font-family: 'Inter', sans-serif;
-        font-size: 1.5rem;
-        font-weight: 700;
-        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
-        margin: 0;
-      }
-      
-      .logo-subtitle {
-        color: rgba(255, 255, 255, 0.9);
-        font-family: 'Inter', sans-serif;
-        font-size: 0.9rem;
-        font-weight: 400;
-        margin: 0;
-      }
-    </style>
   </head>
-  <body class="bg-gray-50">
-    <!-- Logo with Title Display -->
-    <div class="logo-title-container">
-      <img src="/logo.png" alt="WhatsApp Support Logo" class="logo-img">
-      <div>
-        <h1 class="logo-title">WhatsApp Support</h1>
-        <p class="logo-subtitle">Account Recovery Tool</p>
-      </div>
+  <body>
+    <!-- Simple Logo with Title -->
+    <div class="flex items-center p-4">
+      <img src="/logo.png" alt="Logo" class="w-10 h-10 mr-3">
+      <h1 class="text-xl font-bold text-gray-800">WhatsApp Support</h1>
     </div>
     
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
-    
-    <!-- Optional: Add smooth fade-in animation -->
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const logoContainer = document.querySelector('.logo-title-container');
-        if (logoContainer) {
-          logoContainer.style.opacity = '0';
-          logoContainer.style.transition = 'opacity 0.5s ease-in-out';
-          
-          setTimeout(() => {
-            logoContainer.style.opacity = '1';
-          }, 100);
-        }
-      });
-    </script>
   </body>
 </html>
