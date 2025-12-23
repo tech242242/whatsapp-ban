@@ -1,104 +1,358 @@
 import { useState, useEffect } from 'react';
 import './App.css';
 
+// Landing Animation Component
 const LandingAnimation = () => {
-  // ... existing landing animation code ...
+  const [isVisible, setIsVisible] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsVisible(false);
+    }, 2500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!isVisible) return null;
+
+  return (
+    <div className="landing-overlay">
+      <div className="whatsapp-loader">
+        <div className="whatsapp-icon">
+          <div className="phone"></div>
+          <div className="speaker"></div>
+          <div className="camera"></div>
+        </div>
+        <div className="loading-text">
+          <h2>WhatsApp Support</h2>
+          <p>Loading recovery tool...</p>
+          <div className="loading-dots">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
+// Main App Component
 function App() {
-  // ... existing states ...
+  const [refId, setRefId] = useState('WA-000000')
+  const [currentSection, setCurrentSection] = useState(1)
+  const [name, setName] = useState('Muhammad Saqib')
+  const [countryCode, setCountryCode] = useState('+92')
+  const [phone, setPhone] = useState('3478936242')
+  const [selectedEmailType, setSelectedEmailType] = useState(null)
+  const [previewSubject, setPreviewSubject] = useState('')
+  const [previewBody, setPreviewBody] = useState('Loading email content...')
+  const [showLanding, setShowLanding] = useState(true)
+  
+  // PWA Install States
+  const [deferredPrompt, setDeferredPrompt] = useState(null)
+  const [showInstallButton, setShowInstallButton] = useState(false)
+  const [isAppInstalled, setIsAppInstalled] = useState(false)
+  const [showInstallHint, setShowInstallHint] = useState(false)
 
-  // PWA Install State
-  const [deferredPrompt, setDeferredPrompt] = useState(null);
-  const [showInstallButton, setShowInstallButton] = useState(false);
-  const [isAppInstalled, setIsAppInstalled] = useState(false);
-
-  // ... existing useEffects ...
-
-  // PWA Install Prompt Handler
   useEffect(() => {
-    // Check if app is already installed
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-      setIsAppInstalled(true);
-      setShowInstallButton(false);
+    const landingTimer = setTimeout(() => {
+      setShowLanding(false)
+    }, 2500)
+    
+    const rand = Math.floor(100000 + Math.random() * 900000)
+    const id = 'WA-' + rand
+    setRefId(id)
+    
+    return () => {
+      clearTimeout(landingTimer)
+    }
+  }, [])
+
+  // PWA Install Logic
+  useEffect(() => {
+    // Check if app is already installed (standalone mode)
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
+    
+    if (isStandalone) {
+      setIsAppInstalled(true)
+      setShowInstallButton(false)
     }
 
-    // Listen for beforeinstallprompt event
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
-      setShowInstallButton(true);
-    });
+    // Listen for beforeinstallprompt event (Chrome, Edge, etc.)
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault()
+      setDeferredPrompt(e)
+      
+      // Show install hint after 5 seconds if not already installed
+      setTimeout(() => {
+        if (!isAppInstalled) {
+          setShowInstallHint(true)
+        }
+      }, 5000)
+    }
+
+    // Check if browser supports PWA installation
+    const isPWAInstallable = 'BeforeInstallPromptEvent' in window
+    
+    if (isPWAInstallable) {
+      window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
+    }
 
     // Listen for app installed event
     window.addEventListener('appinstalled', () => {
-      setIsAppInstalled(true);
-      setShowInstallButton(false);
-      console.log('PWA installed successfully');
-    });
+      setIsAppInstalled(true)
+      setShowInstallButton(false)
+      setShowInstallHint(false)
+      showInstallSuccessMessage()
+    })
+
+    // For iOS devices, show custom install instructions
+    if (isIOS && !isStandalone) {
+      setTimeout(() => {
+        setShowInstallHint(true)
+      }, 7000)
+    }
 
     return () => {
-      window.removeEventListener('beforeinstallprompt', () => {});
-      window.removeEventListener('appinstalled', () => {});
-    };
-  }, []);
-
-  // Handle Install Button Click
-  const handleInstallClick = async () => {
-    if (!deferredPrompt) return;
-    
-    deferredPrompt.prompt();
-    
-    const { outcome } = await deferredPrompt.userChoice;
-    console.log(`User response to the install prompt: ${outcome}`);
-    
-    setDeferredPrompt(null);
-    setShowInstallButton(false);
-    
-    if (outcome === 'accepted') {
-      setIsAppInstalled(true);
-      showInstallSuccessMessage();
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
+      window.removeEventListener('appinstalled', () => {})
     }
-  };
+  }, [isAppInstalled])
 
-  // Show Install Success Message
+  useEffect(() => {
+    if (currentSection === 3) updateEmailPreview()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentSection, selectedEmailType, name, countryCode, phone])
+
+  function formatNumber(country, number) {
+    const digits = number.replace(/\D/g, '')
+    if (digits.length === 10) {
+      return `${country} ${digits.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2$3')}`
+    }
+    return `${country} ${number}`
+  }
+
+  function nextSection(next) {
+    if (next === 2 && (!name.trim() || !phone.trim())) {
+      alert('Please enter your name and WhatsApp number first.')
+      return
+    }
+    if (next === 3 && !selectedEmailType) {
+      alert('Please select an email type first.')
+      return
+    }
+    setCurrentSection(next)
+  }
+
+  function prevSection(prev) {
+    setCurrentSection(prev)
+  }
+
+  function selectEmailType(type) {
+    setSelectedEmailType(type)
+  }
+
+  function updateEmailPreview() {
+    const formattedNumber = formatNumber(countryCode, phone)
+    let subject, body
+
+    if (selectedEmailType === 'recovery') {
+      subject = `Account Recovery Request - WhatsApp Number ${formattedNumber}`
+      body = `Dear WhatsApp Support Team,
+
+I hope you are doing well.
+
+I am writing this email to kindly request a review of my WhatsApp account which has been banned recently. I believe this ban may have been applied by mistake, as I have not knowingly violated any WhatsApp Terms of Service or Community Guidelines.
+
+My WhatsApp number is:
+📞 ${formattedNumber}
+
+This number is very important to me as I use it for personal communication, family contact, and daily use. I always try to follow WhatsApp rules and use the app responsibly.
+
+If any activity from my account unintentionally violated your policies, I sincerely apologize and assure you that it will not happen again in the future. I kindly request you to please review my account and restore access if possible.
+
+Thank you for your time and support. I look forward to your positive response.
+
+Kind regards,
+${name}
+Pakistan`
+    } else {
+      subject = `Permanent Ban Request - WhatsApp Number ${formattedNumber}`
+      body = `Dear WhatsApp Support Team,
+
+I hope you are doing well.
+
+I am writing this email to request the permanent ban of my WhatsApp number due to serious security concerns. I believe my WhatsApp account may have been hacked or accessed by someone else without my permission, and there is a risk that it could be misused.
+
+My WhatsApp number is:
+📞 ${formattedNumber}
+
+To avoid any misuse, scams, or illegal activity from my number, I kindly request you to please permanently ban or deactivate this WhatsApp account as soon as possible.
+
+This request is being made for my personal safety and security, as the number may have fallen into the wrong hands.
+
+Thank you for your understanding and prompt support. I will appreciate your quick action in this matter.
+
+Kind regards,
+${name}
+Pakistan`
+    }
+
+    setPreviewSubject(subject)
+    setPreviewBody(body)
+  }
+
+  function sendEmail() {
+    if (!name.trim() || !phone.trim()) {
+      alert('Please enter your name and WhatsApp number first.')
+      return
+    }
+    if (!selectedEmailType) {
+      alert('Please select an email type first.')
+      return
+    }
+
+    const formattedNumber = formatNumber(countryCode, phone)
+    const recipient = 'support@whatsapp.com'
+    const subject = previewSubject || `WhatsApp Support - ${formattedNumber}`
+    const body = previewBody || ''
+
+    const mailtoLink = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+    window.location.href = mailtoLink
+    showSuccessMessage()
+  }
+
+  function showSuccessMessage() {
+    const el = document.createElement('div')
+    el.className = 'fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-6 py-4 rounded-xl shadow-lg z-50 max-w-sm'
+    el.innerHTML = `
+      <div class="flex items-start">
+        <svg class="w-6 h-6 text-green-600 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+        </svg>
+        <div>
+          <p class="font-bold">Email App Opened!</p>
+          <p class="text-sm mt-1">Your email is ready. Just click <strong>SEND</strong> in your email app to submit to WhatsApp Support.</p>
+        </div>
+      </div>
+    `
+    document.body.appendChild(el)
+    setTimeout(() => el.remove(), 6000)
+  }
+
+  // PWA Install Functions
+  const handleInstallClick = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt()
+      const { outcome } = await deferredPrompt.userChoice
+      
+      if (outcome === 'accepted') {
+        setIsAppInstalled(true)
+        setDeferredPrompt(null)
+        setShowInstallButton(false)
+        setShowInstallHint(false)
+        showInstallSuccessMessage()
+      }
+    } else {
+      // For browsers that don't support beforeinstallprompt
+      showInstallInstructions()
+    }
+  }
+
   const showInstallSuccessMessage = () => {
-    const el = document.createElement('div');
-    el.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-100 border border-green-400 text-green-700 px-6 py-4 rounded-xl shadow-lg z-50 max-w-sm';
+    const el = document.createElement('div')
+    el.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-100 border border-green-400 text-green-700 px-6 py-4 rounded-xl shadow-lg z-50 max-w-sm'
     el.innerHTML = `
       <div class="flex items-center">
         <svg class="w-6 h-6 text-green-600 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
           <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
         </svg>
         <div>
-          <p class="font-bold">App Installed Successfully!</p>
-          <p class="text-sm mt-1">WhatsApp Support Tool is now installed on your device.</p>
+          <p class="font-bold">App Installed!</p>
+          <p class="text-sm mt-1">WhatsApp Support is now on your home screen.</p>
         </div>
       </div>
-    `;
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), 5000);
-  };
+    `
+    document.body.appendChild(el)
+    setTimeout(() => el.remove(), 5000)
+  }
 
-  // Handle Share Button
-  const handleShareClick = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: 'WhatsApp Support Tool',
-          text: 'Install WhatsApp Support Tool for account recovery',
-          url: window.location.href,
-        });
-        console.log('Content shared successfully');
-      } catch (error) {
-        console.log('Error sharing:', error);
-      }
+  const showInstallInstructions = () => {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+    
+    let instructions = ''
+    
+    if (isIOS || isSafari) {
+      instructions = `
+        <div class="p-4">
+          <h3 class="font-bold text-gray-800 mb-2">How to Install on iOS/Safari:</h3>
+          <ol class="text-sm text-gray-600 space-y-2 list-decimal pl-4">
+            <li>Tap the Share button <span class="font-bold">(□ with ↑)</span></li>
+            <li>Scroll down and tap <span class="font-bold">"Add to Home Screen"</span></li>
+            <li>Tap <span class="font-bold">"Add"</span> in the top right</li>
+            <li>The app will appear on your home screen</li>
+          </ol>
+        </div>
+      `
     } else {
-      // Fallback: Copy to clipboard
-      navigator.clipboard.writeText(window.location.href);
-      alert('Link copied to clipboard! Share it with others.');
+      instructions = `
+        <div class="p-4">
+          <h3 class="font-bold text-gray-800 mb-2">How to Install:</h3>
+          <ol class="text-sm text-gray-600 space-y-2 list-decimal pl-4">
+            <li>Look for the <span class="font-bold">"Install"</span> or <span class="font-bold">"Add to Home Screen"</span> button in your browser's address bar</li>
+            <li>Or check the browser menu (⋮ or ⋯) for <span class="font-bold">"Install App"</span></li>
+            <li>Follow the prompts to install</li>
+          </ol>
+        </div>
+      `
     }
-  };
+    
+    const el = document.createElement('div')
+    el.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4'
+    el.innerHTML = `
+      <div class="bg-white rounded-xl shadow-2xl max-w-md w-full">
+        <div class="p-6">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold text-gray-900">Install WhatsApp Support</h2>
+            <button class="text-gray-500 hover:text-gray-700" onclick="this.parentElement.parentElement.parentElement.remove()">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          ${instructions}
+          <div class="mt-6 flex justify-end">
+            <button class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-gray-800 transition" onclick="this.parentElement.parentElement.parentElement.remove()">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    `
+    document.body.appendChild(el)
+    
+    // Close modal when clicking outside
+    el.addEventListener('click', (e) => {
+      if (e.target === el) {
+        el.remove()
+      }
+    })
+  }
+
+  const handleShareClick = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: 'WhatsApp Support Tool',
+        text: 'Install WhatsApp Support Tool for account recovery',
+        url: window.location.href,
+      })
+    } else {
+      navigator.clipboard.writeText(window.location.href)
+      alert('Link copied to clipboard! Share it with others.')
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
@@ -107,7 +361,7 @@ function App() {
       {/* PWA Install Button */}
       {showInstallButton && !isAppInstalled && (
         <div className="install-btn">
-          <div className="bg-white rounded-xl shadow-2xl p-4 border border-green-200 max-w-xs">
+          <div className="bg-white rounded-xl shadow-2xl p-4 border border-green-200 max-w-xs install-pulse">
             <div className="flex items-start mb-3">
               <div className="bg-green-100 p-2 rounded-lg mr-3">
                 <svg className="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
@@ -127,29 +381,46 @@ function App() {
                 Install App
               </button>
               <button
-                onClick={handleShareClick}
+                onClick={() => setShowInstallButton(false)}
                 className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-lg text-sm transition-all active:scale-95"
               >
-                Share
+                Later
               </button>
             </div>
             <button
-              onClick={() => setShowInstallButton(false)}
-              className="text-xs text-gray-500 hover:text-gray-700 mt-3 w-full text-center"
+              onClick={handleShareClick}
+              className="text-xs text-green-600 hover:text-green-700 mt-3 w-full text-center flex items-center justify-center"
             >
-              Not now
+              <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M15 8a3 3 0 11-6 0 3 3 0 016 0zm-2 0a1 1 0 11-2 0 1 1 0 012 0zM7 14a5 5 0 0110 0v1H7v-1z" clipRule="evenodd" />
+              </svg>
+              Share with friends
             </button>
           </div>
         </div>
       )}
 
-      {/* Main App Content */}
+      {/* Install Hint (Small button in header) */}
+      {showInstallHint && !isAppInstalled && !showInstallButton && (
+        <div className="fixed top-4 left-4 z-40">
+          <button
+            onClick={() => setShowInstallButton(true)}
+            className="bg-green-500 hover:bg-green-600 text-white text-xs font-medium px-3 py-2 rounded-lg shadow-md transition-all flex items-center"
+          >
+            <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+            Install App
+          </button>
+        </div>
+      )}
+
       <div className="flex items-center justify-center min-h-screen p-4">
         <div className="w-full max-w-md glass-card overflow-hidden">
-          {/* WhatsApp Header with Install Indicator */}
+          {/* WhatsApp Header */}
           <div className="whatsapp-dark-green p-8 text-white text-center relative">
             {isAppInstalled && (
-              <div className="absolute top-2 left-2 bg-white/20 px-2 py-1 rounded-full flex items-center">
+              <div className="absolute top-3 left-3 bg-white/20 px-2 py-1 rounded-full flex items-center">
                 <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
@@ -165,14 +436,16 @@ function App() {
             <h1 className="text-2xl font-bold tracking-tight">WhatsApp Support</h1>
             <p className="text-green-100 text-sm opacity-90">Account Management Tool</p>
             
-            {/* Install Hint for First Time Users */}
-            {!isAppInstalled && !showInstallButton && (
+            {!isAppInstalled && (
               <div className="mt-4">
                 <button
                   onClick={() => setShowInstallButton(true)}
-                  className="text-xs bg-white/20 hover:bg-white/30 px-3 py-1 rounded-full transition-colors"
+                  className="text-xs bg-white/20 hover:bg-white/30 px-3 py-1 rounded-full transition-colors flex items-center mx-auto"
                 >
-                  ⬇️ Install App
+                  <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                  Install App
                 </button>
               </div>
             )}
@@ -182,12 +455,253 @@ function App() {
             </div>
           </div>
 
-          {/* ... باقی App کا content (بالکل ویسا ہی جیسا پہلے تھا) ... */}
+          {/* Progress Steps */}
+          <div className="px-6 pt-6">
+            <div className="flex justify-between items-center mb-2">
+              <div className="flex items-center space-x-2">
+                <div className={`${currentSection === 1 ? 'step-active' : currentSection > 1 ? 'step-completed' : 'step-active'} w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm`}>1</div>
+                <span className="text-xs font-medium text-gray-700">Your Info</span>
+              </div>
+              <div className="h-1 flex-1 mx-2 bg-gray-200"></div>
+              <div className="flex items-center space-x-2">
+                <div className={`${currentSection === 2 ? 'step-active' : currentSection > 2 ? 'step-completed' : 'step-inactive'} w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm`}>2</div>
+                <span className={`text-xs font-medium ${currentSection >= 2 ? 'text-gray-700' : 'text-gray-500'}`}>Choose Action</span>
+              </div>
+              <div className="h-1 flex-1 mx-2 bg-gray-200"></div>
+              <div className="flex items-center space-x-2">
+                <div className={`${currentSection === 3 ? 'step-active' : 'step-inactive'} w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm`}>3</div>
+                <span className="text-xs font-medium text-gray-500">Send Email</span>
+              </div>
+            </div>
+          </div>
 
+          {/* Form Sections */}
+          <div className="p-6">
+            {/* Section 1 */}
+            <div className={`form-section space-y-6 ${currentSection === 1 ? '' : 'hidden-section'}`}>
+              <div className="space-y-4">
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Your Information</label>
+
+                <div className="space-y-3">
+                  <input
+                    type="text"
+                    id="userName"
+                    placeholder="Your Full Name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm focus:ring-2 focus:ring-green-500 outline-none transition-all"
+                  />
+
+                  <div className="flex space-x-2">
+                    <select id="countryCode" className="w-1/3 bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm focus:ring-2 focus:ring-green-500 outline-none transition-all" value={countryCode} onChange={e => setCountryCode(e.target.value)}>
+                      <option value="+92">🇵🇰 +92</option>
+                      <option value="+91">🇮🇳 +91</option>
+                      <option value="+1">🇺🇸 +1</option>
+                      <option value="+44">🇬🇧 +44</option>
+                      <option value="+971">🇦🇪 +971</option>
+                      <option value="+966">🇸🇦 +966</option>
+                    </select>
+
+                    <input
+                      type="tel"
+                      id="phoneNumber"
+                      placeholder="WhatsApp Number"
+                      value={phone}
+                      onChange={e => setPhone(e.target.value)}
+                      className="w-2/3 bg-gray-50 border border-gray-200 rounded-xl p-4 text-lg font-medium focus:ring-2 focus:ring-green-500 outline-none transition-all"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 flex gap-3">
+                <svg className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                </svg>
+                <p className="text-[11px] text-blue-800 leading-normal">
+                  Your information will be used to generate the support email. The email will open in your email app with all details pre-filled.
+                </p>
+              </div>
+
+              <button
+                onClick={() => nextSection(2)}
+                className="whatsapp-btn w-full whatsapp-green hover:bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center space-x-2"
+              >
+                <span>Continue to Next Step</span>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Section 2 */}
+            <div className={`form-section space-y-6 ${currentSection === 2 ? '' : 'hidden-section'}`}>
+              <div className="space-y-4">
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest ml-1 mb-4">Select Email Type</label>
+
+                <div className="space-y-4">
+                  <div
+                    className={`email-option recovery border border-gray-200 rounded-xl p-5 hover:shadow-md ${selectedEmailType === 'recovery' ? 'selected' : ''}`}
+                    onClick={() => selectEmailType('recovery')}
+                  >
+                    <div className="flex items-start">
+                      <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-4 flex-shrink-0">
+                        <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-gray-800">Account Recovery Request</h3>
+                        <p className="text-sm text-gray-600 mt-1">Request WhatsApp to review and unban your account if it was banned by mistake.</p>
+                        <div className="mt-3 text-xs text-green-600 font-medium">
+                          ✓ Use if your account was banned
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    className={`email-option ban border border-gray-200 rounded-xl p-5 hover:shadow-md ${selectedEmailType === 'ban' ? 'selected' : ''}`}
+                    onClick={() => selectEmailType('ban')}
+                  >
+                    <div className="flex items-start">
+                      <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center mr-4 flex-shrink-0">
+                        <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-gray-800">Permanent Ban Request</h3>
+                        <p className="text-sm text-gray-600 mt-1">Request WhatsApp to permanently ban your account due to security concerns.</p>
+                        <div className="mt-3 text-xs text-red-600 font-medium">
+                          ⚠️ Use if account is hacked or compromised
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-yellow-50 p-4 rounded-xl border border-yellow-100">
+                <div className="flex items-start">
+                  <svg className="w-5 h-5 text-yellow-600 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-xs text-yellow-800">
+                    <span className="font-bold">Important:</span> Please select carefully. Once sent, the request will be processed by WhatsApp's support team.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => prevSection(1)}
+                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-4 rounded-xl transition-all active:scale-95 flex items-center justify-center space-x-2"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                  </svg>
+                  <span>Back</span>
+                </button>
+                <button
+                  onClick={() => nextSection(3)}
+                  id="continueBtn"
+                  className={`flex-1 ${selectedEmailType ? 'whatsapp-green text-white hover:bg-green-600' : 'bg-gray-300 text-gray-500'} font-medium py-4 rounded-xl transition-all flex items-center justify-center space-x-2`}
+                  disabled={!selectedEmailType}
+                >
+                  <span>Continue</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* Section 3 */}
+            <div className={`form-section space-y-6 ${currentSection === 3 ? '' : 'hidden-section'}`}>
+              <div className="space-y-4">
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest ml-1 mb-2">Email Preview</label>
+
+                <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <p className="text-xs text-gray-500">To</p>
+                      <p className="text-sm font-medium">support@whatsapp.com</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-gray-500">Reference</p>
+                      <p className="text-sm font-mono font-bold text-green-600" id="previewRefId">{refId}</p>
+                    </div>
+                  </div>
+
+                  <div className="mb-4">
+                    <p className="text-xs text-gray-500">Subject</p>
+                    <p className="text-sm font-medium" id="previewSubject">{previewSubject}</p>
+                  </div>
+
+                  <div>
+                    <p className="text-xs text-gray-500 mb-2">Email Body Preview</p>
+                    <div className="bg-white p-4 rounded-lg border border-gray-200 max-h-60 overflow-y-auto">
+                      <div className="text-sm text-gray-700 whitespace-pre-line" id="previewBody">
+                        {previewBody}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-green-50 p-4 rounded-xl border border-green-100">
+                <div className="flex items-start">
+                  <svg className="w-5 h-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <div>
+                    <p className="text-sm font-medium text-green-800">Ready to Send!</p>
+                    <p className="text-xs text-green-700 mt-1">Click the button below. Your email app will open with this pre-written email. Just click "Send" in your email app.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => prevSection(2)}
+                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-4 rounded-xl transition-all active:scale-95 flex items-center justify-center space-x-2"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                  </svg>
+                  <span>Back</span>
+                </button>
+                <button
+                  onClick={sendEmail}
+                  className="pulse flex-1 whatsapp-green hover:bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center space-x-2"
+                  id="sendButton"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  <span>Open Email to Send</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="px-6 py-6 bg-gray-50 text-center border-t border-gray-100">
+            <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest">Official WhatsApp Support Tool • Muhammad Saqib</p>
+            {!isAppInstalled && (
+              <button
+                onClick={() => setShowInstallButton(true)}
+                className="mt-2 text-xs text-green-600 hover:text-green-700"
+              >
+                ⬇️ Install for offline access
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
